@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generalized Contrastive PCA | Hyperparameter-Free Contrastive Dimensionality Reduction</title>
+    <meta
+      name="description"
+      content="Generalized Contrastive PCA (gcPCA) is a hyperparameter-free contrastive dimensionality reduction method for discovering patterns enriched in one condition relative to another."
+    >
+    <meta name="theme-color" content="#0b0f14">
+    <meta property="og:title" content="Generalized Contrastive PCA">
+    <meta
+      property="og:description"
+      content="Hyperparameter-free contrastive dimensionality reduction for discovering patterns enriched in one condition relative to another."
+    >
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="assets/img/og-gcpca.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Generalized Contrastive PCA">
+    <meta
+      name="twitter:description"
+      content="gcPCA identifies directions enriched in one dataset relative to another without manual alpha scans."
+    >
+    <meta name="twitter:image" content="assets/img/og-gcpca.png">
+    <!-- TODO: Replace the favicon and OG image with final assets in assets/img/. -->
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['\\[', '\\]']]
+        },
+        options: {
+          enableMenu: false
+        }
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer src="assets/js/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="#top" aria-label="Generalized Contrastive PCA home">gcPCA</a>
+        <nav class="site-nav" aria-label="Section navigation">
+          <ul>
+            <li><a href="#why">Why</a></li>
+            <li><a href="#intuition">Intuition</a></li>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#math">Math</a></li>
+            <li><a href="#results">Results</a></li>
+            <li><a href="#comparison">Comparison</a></li>
+            <li><a href="#install">Quick Start</a></li>
+            <li><a href="#resources">Resources</a></li>
+            <li><a href="#citation">Citation</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="hero section" id="top">
+        <div class="container hero-grid">
+          <div class="hero-copy" data-reveal>
+            <p class="eyebrow">Paper companion site</p>
+            <h1>Generalized Contrastive PCA</h1>
+            <p class="hero-subtitle">
+              Hyperparameter-free contrastive dimensionality reduction for discovering patterns enriched in one
+              condition relative to another.
+            </p>
+            <p class="hero-text">
+              gcPCA is designed for the common scientific setting in which two high-dimensional datasets must be
+              compared directly. Rather than prioritizing overall variance in a single matrix, it ranks directions by
+              how strongly they are enriched in one condition relative to another. The symmetric v4 formulation is the
+              flagship presentation because it treats both datasets equally while yielding interpretable component
+              scores and eigenvalues.
+            </p>
+            <div class="hero-actions">
+              <a
+                class="button button-primary"
+                href="https://doi.org/10.1371/journal.pcbi.1012747"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Paper
+              </a>
+              <a
+                class="button button-secondary"
+                href="https://github.com/SjulsonLab/generalized_contrastive_PCA"
+                target="_blank"
+                rel="noreferrer"
+              >
+                GitHub
+              </a>
+              <a class="button button-secondary" href="#install">Install</a>
+              <a class="button button-secondary" href="#resources">Tutorials</a>
+            </div>
+            <!-- TODO: If the published package name changes, update the install chip and quick-start import together. -->
+            <div class="install-chip" role="group" aria-label="Install command">
+              <code id="install-command">pip install generalized-contrastive-PCA</code>
+              <button class="copy-button" type="button" data-copy-target="install-command">Copy</button>
+            </div>
+            <div class="hero-meta" aria-label="Publication metadata">
+              <span>PLOS Computational Biology</span>
+              <span>Published February 7, 2025</span>
+              <span>Python, MATLAB, and R implementations</span>
+            </div>
+          </div>
+
+          <aside class="hero-panel card" data-reveal>
+            <p class="panel-label">Why researchers reach for gcPCA</p>
+            <h2>Contrast without tuning</h2>
+            <ul class="feature-list">
+              <li>Hyperparameter-free contrastive dimensionality reduction for paired conditions.</li>
+              <li>Designed to identify directions enriched in dataset A relative to dataset B, or vice versa.</li>
+              <li>v4 uses a symmetric normalized objective, so neither dataset is privileged as pure background.</li>
+              <li>Eigenvalues stay in a compact, interpretable range, making components easier to read and compare.</li>
+            </ul>
+            <div class="pill-row" aria-label="Method highlights">
+              <span class="pill">Hyperparameter-free</span>
+              <span class="pill">Symmetric v4</span>
+              <span class="pill">Sparse variants</span>
+              <span class="pill">Research-ready</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="why">
+        <div class="container">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Why gcPCA</p>
+            <h2>When the scientific question is contrast, vanilla PCA is asking the wrong question.</h2>
+            <p class="section-lead">
+              PCA operates on one dataset at a time and prioritizes total variance. Many experiments, however, are
+              fundamentally comparative: treated versus control, wake versus sleep, baseline versus stimulation,
+              expression A versus expression B. In that setting, the dominant modes of variation can be shared across
+              both conditions and obscure the low-dimensional structure that actually differs.
+            </p>
+          </div>
+
+          <div class="info-grid">
+            <article class="card" data-reveal>
+              <h3>Single-dataset variance is not the full story</h3>
+              <p>
+                PCA is powerful when one matrix contains the whole question. For paired conditions, it cannot directly
+                ask whether a direction is preferentially enriched in one dataset relative to another.
+              </p>
+            </article>
+            <article class="card" data-reveal>
+              <h3>Shared background structure can dominate</h3>
+              <p>
+                Large common sources of variance, including batch effects, population-wide fluctuations, or shared
+                covariance structure, can overwhelm the condition-specific signal researchers actually want to study.
+              </p>
+            </article>
+            <article class="card" data-reveal>
+              <h3>cPCA introduced the right instinct</h3>
+              <p>
+                cPCA framed the problem as a contrast between conditions, but the method typically requires scanning
+                over a hyperparameter \(\alpha\), yielding multiple candidate embeddings and no intrinsic rule for
+                selecting the correct one.
+              </p>
+            </article>
+            <article class="card" data-reveal>
+              <h3>gcPCA normalizes the contrast</h3>
+              <p>
+                gcPCA reformulates the objective so it emphasizes relative changes in variance instead of favoring
+                high-variance dimensions by default. The result is a practical, hyperparameter-free workflow that is
+                easier to interpret and easier to use.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-soft" id="intuition">
+        <div class="container">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Visual intuition</p>
+            <h2>Relative enrichment matters more than raw magnitude.</h2>
+            <p class="section-lead">
+              In synthetic settings with strong shared variance, the most informative structure can be low in absolute
+              variance yet clearly enriched in one condition. gcPCA is built to surface that relative change.
+            </p>
+          </div>
+
+          <figure class="figure-card card figure-card-wide" data-reveal>
+            <button
+              class="figure-media js-lightbox-trigger"
+              type="button"
+              data-image-src="assets/img/fig1-synthetic.png"
+              data-image-alt="Synthetic intuition figure showing low-variance condition-specific structure emerging under generalized contrastive PCA."
+              data-image-caption="Synthetic intuition: gcPCA emphasizes relative changes in variance and can recover low-variance condition-specific structure hidden beneath larger shared variance."
+              data-placeholder-label="Add assets/img/fig1-synthetic.png to show the synthetic intuition figure."
+            >
+              <!-- TODO: Replace this placeholder path with the final synthetic intuition figure asset. -->
+              <img
+                class="figure-image"
+                src="assets/img/fig1-synthetic.png"
+                alt="Synthetic intuition figure showing low-variance condition-specific structure emerging under generalized contrastive PCA."
+                loading="lazy"
+              >
+              <span class="figure-placeholder" hidden></span>
+            </button>
+            <figcaption>
+              Synthetic intuition: gcPCA emphasizes relative changes in variance and can recover low-variance
+              condition-specific structure that sits beneath large shared dimensions. This is the core reason the
+              method succeeds where overall-variance methods can miss the scientific signal.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="overview">
+        <div class="container">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Method overview</p>
+            <h2>Four steps from paired datasets to generalized contrastive components.</h2>
+          </div>
+
+          <div class="steps-grid">
+            <article class="step-card card" data-reveal>
+              <span class="step-number">01</span>
+              <h3>Estimate covariance in both conditions</h3>
+              <p>
+                Start from two matched feature spaces, dataset A and dataset B, and compute the covariance matrices
+                \(C_A\) and \(C_B\).
+              </p>
+            </article>
+            <article class="step-card card" data-reveal>
+              <span class="step-number">02</span>
+              <h3>Construct a contrastive objective</h3>
+              <p>
+                Define a direction \(x\) that should score highly when variance is enriched in one dataset relative to
+                the other.
+              </p>
+            </article>
+            <article class="step-card card" data-reveal>
+              <span class="step-number">03</span>
+              <h3>Normalize the contrast</h3>
+              <p>
+                Normalize by background variance or total variance, depending on the variant, so the objective reflects
+                relative enrichment rather than raw scale.
+              </p>
+            </article>
+            <article class="step-card card" data-reveal>
+              <span class="step-number">04</span>
+              <h3>Solve the eigenproblem and project</h3>
+              <p>
+                Solve the resulting eigenvalue problem, rank the generalized contrastive components, and project each
+                dataset into the low-dimensional space for visualization or downstream analysis.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-soft" id="math">
+        <div class="container">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Mathematical formulation</p>
+            <h2>The flagship v4 objective is symmetric, bounded, and easy to interpret.</h2>
+          </div>
+
+          <div class="math-layout">
+            <article class="card equation-card" data-reveal>
+              <p class="equation-label">Main objective</p>
+              <div class="equation-block">
+                \[
+                \max_{x}
+                \frac{x^\mathsf{T}(C_A - C_B)x}{x^\mathsf{T}(C_A + C_B)x},
+                \quad \text{subject to } \lVert x \rVert_2 = 1
+                \]
+              </div>
+              <p>
+                In v4, the numerator measures the contrast between conditions while the denominator normalizes by total
+                variance. This makes the formulation symmetric and naturally suited to comparisons in which both
+                datasets should be treated on equal footing.
+              </p>
+            </article>
+
+            <article class="card keyfacts-card" data-reveal>
+              <p class="equation-label">Interpretation</p>
+              <ul class="keyfacts-list">
+                <li><strong>v4 is symmetric.</strong> Swapping A and B flips the sign of the eigenvalues, not the logic.</li>
+                <li><strong>Eigenvalues lie in \([-1, 1]\).</strong> The scale is compact and comparable across components.</li>
+                <li><strong>Positive values</strong> indicate components enriched in A.</li>
+                <li><strong>Negative values</strong> indicate components enriched in B.</li>
+                <li><strong>Values near zero</strong> indicate structure shared across both datasets.</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="table-shell card" data-reveal>
+            <table>
+              <caption>Compact summary of gcPCA variants</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Variant</th>
+                  <th scope="col">Objective</th>
+                  <th scope="col">Interpretation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">v2</th>
+                  <td>\(A / B\)</td>
+                  <td>Asymmetric ratio useful when B is a background condition.</td>
+                </tr>
+                <tr>
+                  <th scope="row">v3</th>
+                  <td>\((A - B) / B\)</td>
+                  <td>Asymmetric relative change with B as the reference.</td>
+                </tr>
+                <tr>
+                  <th scope="row">v4</th>
+                  <td>\((A - B) / (A + B)\)</td>
+                  <td>Symmetric contrast and the recommended default for paired conditions.</td>
+                </tr>
+                <tr>
+                  <th scope="row">v2.1 / v3.1 / v4.1</th>
+                  <td>Orthogonal variants</td>
+                  <td>Preserve orthogonality in the original feature space when that constraint matters.</td>
+                </tr>
+                <tr>
+                  <th scope="row">Sparse options</th>
+                  <td>L1 feature selection</td>
+                  <td>Encourage interpretability by selecting compact sets of informative features.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="results">
+        <div class="container">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Example results</p>
+            <h2>From controlled synthetic structure to real experimental data.</h2>
+            <p class="section-lead">
+              The method is most compelling when strong shared variance would otherwise dominate the embedding.
+              gcPCA keeps the comparison centered on enrichment, not raw scale.
+            </p>
+          </div>
+
+          <div class="results-grid">
+            <article class="card result-card" data-reveal>
+              <div class="result-copy">
+                <h3>Synthetic data</h3>
+                <p>
+                  PCA follows the highest total variance, which can be largely shared across conditions. cPCA can
+                  recover the contrastive manifold, but often only after a manual sweep over \(\alpha\). gcPCA returns
+                  components ordered by normalized enrichment, making low-variance condition-specific structure much
+                  easier to recover and compare.
+                </p>
+              </div>
+              <button
+                class="figure-media js-lightbox-trigger"
+                type="button"
+                data-image-src="assets/img/tutorial-comparison.png"
+                data-image-alt="Conceptual comparison figure for PCA, cPCA, and gcPCA on synthetic data."
+                data-image-caption="Conceptual comparison of PCA, cPCA, and gcPCA on synthetic contrastive data."
+                data-placeholder-label="Add assets/img/tutorial-comparison.png to show the synthetic comparison figure."
+              >
+                <!-- TODO: Replace this placeholder path with the final tutorial comparison figure asset. -->
+                <img
+                  class="figure-image"
+                  src="assets/img/tutorial-comparison.png"
+                  alt="Conceptual comparison figure for PCA, cPCA, and gcPCA on synthetic data."
+                  loading="lazy"
+                >
+                <span class="figure-placeholder" hidden></span>
+              </button>
+            </article>
+
+            <article class="card result-card" data-reveal>
+              <div class="result-copy">
+                <h3>Real data: facial expression structure</h3>
+                <p>
+                  In the face-expression example presented with the method, gcPCA highlights expression-related
+                  structure while discounting shared identity variation. The result is a compact view of the features
+                  that differ between conditions without requiring supervised labels or a hyperparameter search.
+                </p>
+              </div>
+              <button
+                class="figure-media js-lightbox-trigger"
+                type="button"
+                data-image-src="assets/img/fig2-faces.png"
+                data-image-alt="Face expression figure showing how generalized contrastive PCA separates condition-specific structure."
+                data-image-caption="Face-expression example illustrating how gcPCA highlights condition-specific structure."
+                data-placeholder-label="Add assets/img/fig2-faces.png to show the face-expression example figure."
+              >
+                <!-- TODO: Replace this placeholder path with the final face-expression figure asset. -->
+                <img
+                  class="figure-image"
+                  src="assets/img/fig2-faces.png"
+                  alt="Face expression figure showing how generalized contrastive PCA separates condition-specific structure."
+                  loading="lazy"
+                >
+                <span class="figure-placeholder" hidden></span>
+              </button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-soft" id="comparison">
+        <div class="container">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Comparison to related methods</p>
+            <h2>gcPCA sits between classical PCA and supervised separation methods.</h2>
+          </div>
+
+          <div class="table-shell card" data-reveal>
+            <table>
+              <caption>How gcPCA differs from common dimensionality reduction methods</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Method</th>
+                  <th scope="col">What it optimizes</th>
+                  <th scope="col">Requires hyperparameter search?</th>
+                  <th scope="col">Symmetric?</th>
+                  <th scope="col">Best use case</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">PCA</th>
+                  <td>Total variance in a single dataset.</td>
+                  <td>No</td>
+                  <td>Not applicable</td>
+                  <td>Summarizing dominant variation within one condition.</td>
+                </tr>
+                <tr>
+                  <th scope="row">LDA</th>
+                  <td>Separation between labeled groups relative to within-group spread.</td>
+                  <td>No</td>
+                  <td>No</td>
+                  <td>Supervised discrimination when class labels are available.</td>
+                </tr>
+                <tr>
+                  <th scope="row">cPCA</th>
+                  <td>\(\mathrm{Var}_A - \alpha \mathrm{Var}_B\)</td>
+                  <td>Yes</td>
+                  <td>No</td>
+                  <td>Foreground-versus-background comparisons when manual \(\alpha\) scans are acceptable.</td>
+                </tr>
+                <tr>
+                  <th scope="row">gcPCA</th>
+                  <td>Normalized contrastive variance, including the symmetric v4 ratio.</td>
+                  <td>No</td>
+                  <td>Yes, in v4</td>
+                  <td>Unsupervised comparison of two conditions with interpretable contrastive structure.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="install">
+        <div class="container install-layout">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Python package / quick start</p>
+            <h2>Move from paper to working code in a few lines.</h2>
+            <p class="section-lead">
+              The gcPCA toolbox is available as a Python package and as companion code in the main repository. The v4
+              formulation is a strong default when the two datasets should be compared symmetrically.
+            </p>
+            <div class="install-panel card">
+              <div class="install-panel-head">
+                <h3>Install from PyPI</h3>
+                <button class="copy-button" type="button" data-copy-target="install-command">Copy</button>
+              </div>
+              <pre class="code-block"><code>pip install generalized-contrastive-PCA</code></pre>
+              <p class="code-note">
+                <a href="https://pypi.org/project/generalized-contrastive-pca/" target="_blank" rel="noreferrer">PyPI package</a>
+                and
+                <a href="https://github.com/SjulsonLab/generalized_contrastive_PCA" target="_blank" rel="noreferrer">source repository</a>
+                are both publicly available.
+              </p>
+            </div>
+          </div>
+
+          <div class="card code-card" data-reveal>
+            <div class="install-panel-head">
+              <h3>Quick start</h3>
+            </div>
+            <!-- TODO: Re-check the snippet against the exact API version you plan to highlight on the final site. -->
+            <pre class="code-block"><code>from generalized_contrastive_PCA import gcPCA
+
+model = gcPCA(method="v4", normalize_flag=True)
+model.fit(X_A, X_B)
+
+scores_A = model.Ra_scores_
+scores_B = model.Rb_scores_
+loadings = model.loadings_
+eigenvalues = model.gcPCA_values_</code></pre>
+            <p class="code-note">
+              The current repository README documents <code>gcPCA(method="v4", normalize_flag=True)</code> followed by
+              <code>fit(X_A, X_B)</code>, with outputs such as <code>loadings_</code>, <code>Ra_scores_</code>,
+              <code>Rb_scores_</code>, and <code>gcPCA_values_</code>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-soft" id="resources">
+        <div class="container">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Resources</p>
+            <h2>Start with the paper, then move into code, notebooks, and implementation details.</h2>
+          </div>
+
+          <div class="resource-grid">
+            <article class="card resource-card" data-reveal>
+              <h3>Paper</h3>
+              <p>The peer-reviewed PLOS Computational Biology article introducing the method and its applications.</p>
+              <a href="https://doi.org/10.1371/journal.pcbi.1012747" target="_blank" rel="noreferrer">Open paper</a>
+            </article>
+            <article class="card resource-card" data-reveal>
+              <h3>Main code repository</h3>
+              <p>Python, MATLAB, and R implementations of gcPCA, plus repository-level installation and usage notes.</p>
+              <a href="https://github.com/SjulsonLab/generalized_contrastive_PCA" target="_blank" rel="noreferrer">View repository</a>
+            </article>
+            <article class="card resource-card" data-reveal>
+              <h3>Python tutorial notebook</h3>
+              <p>Notebook-based walkthroughs and example material in the repository tutorial directory.</p>
+              <a
+                href="https://github.com/SjulsonLab/generalized_contrastive_PCA/tree/main/tutorial"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open tutorial directory
+              </a>
+            </article>
+            <article class="card resource-card resource-card-pending" data-reveal>
+              <h3>Additional tutorial notebook</h3>
+              <p>
+                A second featured notebook can be linked here once you choose which example from the tutorial material
+                you want to spotlight on the landing page.
+              </p>
+              <!-- TODO: Replace this pending state with a direct notebook URL once you choose the second featured walkthrough. -->
+              <span class="pending-link" aria-label="Link pending">URL pending</span>
+            </article>
+            <article class="card resource-card" data-reveal>
+              <h3>Documentation</h3>
+              <p>Package details, installation notes, and current usage examples for the released Python build.</p>
+              <a href="https://pypi.org/project/generalized-contrastive-pca/" target="_blank" rel="noreferrer">View package docs</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="citation">
+        <div class="container citation-layout">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Citation</p>
+            <h2>Cite gcPCA if the method contributes to your work.</h2>
+          </div>
+
+          <article class="card citation-card" data-reveal>
+            <h3>Plain citation</h3>
+            <p class="plain-citation">
+              de Oliveira EF, Garg P, Hjerling-Leffler J, Batista-Brito R, Sjulson L (2025) Identifying patterns
+              differing between high-dimensional datasets with generalized contrastive PCA. <em>PLOS Computational
+              Biology</em> 21(2): e1012747. https://doi.org/10.1371/journal.pcbi.1012747
+            </p>
+          </article>
+
+          <article class="card citation-card" data-reveal>
+            <div class="install-panel-head">
+              <h3>BibTeX</h3>
+              <button class="copy-button" type="button" data-copy-target="bibtex-block">Copy</button>
+            </div>
+            <pre class="code-block" id="bibtex-block"><code>@article{deOliveira2025gcPCA,
+  author = {de Oliveira, Eliezyer F. and Garg, Pranjal and Hjerling-Leffler, Jens and Batista-Brito, Renata and Sjulson, Lucas},
+  title = {Identifying patterns differing between high-dimensional datasets with generalized contrastive PCA},
+  journal = {PLOS Computational Biology},
+  year = {2025},
+  volume = {21},
+  number = {2},
+  pages = {e1012747},
+  doi = {10.1371/journal.pcbi.1012747},
+  url = {https://doi.org/10.1371/journal.pcbi.1012747}
+}</code></pre>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-shell">
+        <p>gcPCA is a hyperparameter-free contrastive dimensionality reduction method for comparing paired conditions.</p>
+        <a href="#top">Back to top</a>
+      </div>
+    </footer>
+
+    <button class="back-to-top" type="button" aria-label="Back to top">Top</button>
+
+    <div class="sr-only" id="copy-status" aria-live="polite"></div>
+
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+      <div class="lightbox-backdrop" data-close-lightbox></div>
+      <div class="lightbox-dialog" role="dialog" aria-modal="true" aria-labelledby="lightbox-caption">
+        <button class="lightbox-close" type="button" aria-label="Close image viewer" data-close-lightbox>
+          Close
+        </button>
+        <img class="lightbox-image" src="" alt="">
+        <p class="lightbox-caption" id="lightbox-caption"></p>
+      </div>
+    </div>
+  </body>
+</html>
