@@ -220,7 +220,7 @@
             <figcaption>
               Synthetic intuition: gcPCA emphasizes relative changes in variance and can recover low-variance
               condition-specific structure that sits beneath large shared dimensions. This is the core reason the
-              method succeeds where overall-variance methods can miss the scientific signal.
+              method succeeds where overall-variance methods can miss the relevant changes.
             </figcaption>
           </figure>
         </div>
@@ -389,33 +389,34 @@
               </button>
             </article>
 
-            <article class="card result-card" data-reveal>
-              <div class="result-copy">
-                <h3>Real data: facial expression structure</h3>
-                <p>
-                  In the face-expression example presented with the method, gcPCA highlights expression-related
-                  structure while discounting shared identity variation. The result is a compact view of the features
-                  that differ between conditions without requiring supervised labels or a hyperparameter search.
-                </p>
-              </div>
-              <button
-                class="figure-media js-lightbox-trigger"
-                type="button"
-                data-image-src="assets/img/fig2-faces.png"
-                data-image-alt="Face expression figure showing how generalized contrastive PCA separates condition-specific structure."
-                data-image-caption="Face-expression example illustrating how gcPCA highlights condition-specific structure."
-                data-placeholder-label="Add assets/img/fig2-faces.png to show the face-expression example figure."
-              >
-                <!-- TODO: Replace this placeholder path with the final face-expression figure asset. -->
-                <img
-                  class="figure-image"
-                  src="assets/img/fig2-faces.png"
-                  alt="Face expression figure showing how generalized contrastive PCA separates condition-specific structure."
-                  loading="lazy"
+              <article class="card result-card" data-reveal>
+                <div class="result-copy">
+                  <h3>Real data: replay structure</h3>
+                  <p>
+                    In the replay example, a side-by-side comparison with PCA makes the advantage of gcPCA more
+                    apparent. PCA remains dominated by the largest shared modes of activity, whereas gcPCA emphasizes
+                    the dimensions selectively enriched during replay. The result is a clearer low-dimensional view of
+                    replay-related structure without requiring supervised labels or a hyperparameter search.
+                  </p>
+                </div>
+                <button
+                  class="figure-media js-lightbox-trigger"
+                  type="button"
+                  data-image-src="assets/img/fig2-replay.png"
+                  data-image-alt="Side-by-side PCA and gcPCA replay comparison showing replay-related structure more clearly in gcPCA."
+                  data-image-caption="Replay comparison: PCA captures dominant shared variance, while gcPCA highlights replay-enriched structure."
+                  data-placeholder-label="Add assets/img/fig2-replay.png to show the replay comparison figure."
                 >
-                <span class="figure-placeholder" hidden></span>
-              </button>
-            </article>
+                  <!-- TODO: Replace this placeholder path with the final replay comparison figure asset. -->
+                  <img
+                    class="figure-image"
+                    src="assets/img/fig2-replay.png"
+                    alt="Side-by-side PCA and gcPCA replay comparison showing replay-related structure more clearly in gcPCA."
+                    loading="lazy"
+                  >
+                  <span class="figure-placeholder" hidden></span>
+                </button>
+              </article>
           </div>
         </div>
       </section>
