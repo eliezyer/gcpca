@@ -63,11 +63,21 @@
     </header>
 
     <main id="main-content">
-      <section class="hero section" id="top">
-        <div class="container hero-grid">
-          <div class="hero-copy" data-reveal>
-            <p class="eyebrow">Paper companion site</p>
-            <h1>Generalized Contrastive PCA</h1>
+        <section class="hero section" id="top">
+          <div class="container hero-grid">
+            <div class="hero-copy" data-reveal>
+              <div class="hero-logo-shell" aria-hidden="true">
+                <img
+                  class="hero-logo"
+                  src="assets/img/gcpca_DARK.svg"
+                  alt=""
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                >
+              </div>
+              <p class="eyebrow">Paper companion site</p>
+              <h1>Generalized Contrastive PCA</h1>
             <p class="hero-subtitle">
               Hyperparameter-free contrastive dimensionality reduction for discovering patterns enriched in one
               condition relative to another.
@@ -107,7 +117,7 @@
             <div class="hero-meta" aria-label="Publication metadata">
               <span>PLOS Computational Biology</span>
               <span>Published February 7, 2025</span>
-              <span>Python, MATLAB, and R implementations</span>
+              <span>Python, MATLAB, and R implementations, including CRAN</span>
             </div>
           </div>
 
@@ -470,8 +480,9 @@
             <p class="eyebrow">Python package / quick start</p>
             <h2>Move from paper to working code in a few lines.</h2>
             <p class="section-lead">
-              The gcPCA toolbox is available as a Python package and as companion code in the main repository. The v4
-              formulation is a strong default when the two datasets should be compared symmetrically.
+              The Python example below is the fastest way to get started. gcPCA is also available in R on CRAN and as
+              a MATLAB implementation in the main repository, with additional language-specific notes collected in the
+              GitHub wiki.
             </p>
             <div class="install-panel card">
               <div class="install-panel-head">
@@ -486,11 +497,23 @@
                 are both publicly available.
               </p>
             </div>
+            <div class="install-availability card">
+              <p class="panel-label">Also available</p>
+              <div class="availability-pills" aria-label="Language availability">
+                <a href="https://cran.r-project.org/package=gcpca" target="_blank" rel="noreferrer">R on CRAN</a>
+                <a href="https://github.com/SjulsonLab/generalized_contrastive_PCA/tree/main/matlab" target="_blank" rel="noreferrer">MATLAB</a>
+                <a href="https://github.com/SjulsonLab/generalized_contrastive_PCA/wiki" target="_blank" rel="noreferrer">GitHub wiki</a>
+              </div>
+              <p class="code-note">
+                Use the Python package for the workflow shown here, install <code>gcpca</code> from CRAN for the R
+                interface, or work from the MATLAB implementation when you need a native MATLAB pipeline.
+              </p>
+            </div>
           </div>
 
           <div class="card code-card" data-reveal>
             <div class="install-panel-head">
-              <h3>Quick start</h3>
+              <h3>Quick start in Python</h3>
             </div>
             <!-- TODO: Re-check the snippet against the exact API version you plan to highlight on the final site. -->
             <pre class="code-block"><code>from generalized_contrastive_PCA import gcPCA
@@ -506,6 +529,11 @@ eigenvalues = model.gcPCA_values_</code></pre>
               The current repository README documents <code>gcPCA(method="v4", normalize_flag=True)</code> followed by
               <code>fit(X_A, X_B)</code>, with outputs such as <code>loadings_</code>, <code>Ra_scores_</code>,
               <code>Rb_scores_</code>, and <code>gcPCA_values_</code>.
+            </p>
+            <p class="code-note">
+              R and MATLAB implementations are available as well. The
+              <a href="https://github.com/SjulsonLab/generalized_contrastive_PCA/wiki" target="_blank" rel="noreferrer">GitHub wiki</a>
+              includes additional guidance on package variants, language-specific workflows, and setup details.
             </p>
           </div>
         </div>
@@ -550,9 +578,9 @@ eigenvalues = model.gcPCA_values_</code></pre>
               <span class="pending-link" aria-label="Link pending">URL pending</span>
             </article>
             <article class="card resource-card" data-reveal>
-              <h3>Documentation</h3>
-              <p>Package details, installation notes, and current usage examples for the released Python build.</p>
-              <a href="https://pypi.org/project/generalized-contrastive-pca/" target="_blank" rel="noreferrer">View package docs</a>
+              <h3>Documentation / wiki</h3>
+              <p>Language-specific notes, usage guidance, and additional setup details collected in the project wiki.</p>
+              <a href="https://github.com/SjulsonLab/generalized_contrastive_PCA/wiki" target="_blank" rel="noreferrer">Open GitHub wiki</a>
             </article>
           </div>
         </div>
