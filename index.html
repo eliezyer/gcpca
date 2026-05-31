@@ -12,7 +12,7 @@
     <meta property="og:title" content="Generalized Contrastive PCA">
     <meta
       property="og:description"
-      content="Hyperparameter-free contrastive dimensionality reduction for discovering patterns enriched in one condition relative to another."
+      content="A contrastive dimensionality reduction method for identifying structure that differs between two high-dimensional datasets, without tuning an alpha parameter."
     >
     <meta property="og:type" content="website">
     <meta property="og:image" content="assets/img/og-gcpca.png">
@@ -69,15 +69,10 @@
               <p class="eyebrow">Paper companion site</p>
               <h1>Generalized Contrastive PCA</h1>
             <p class="hero-subtitle">
-              Hyperparameter-free contrastive dimensionality reduction for discovering patterns enriched in one
-              condition relative to another.
+              A contrastive dimensionality reduction method for identifying structure that differs between two high-dimensional datasets, without tuning an alpha parameter.
             </p>
             <p class="hero-text">
-              gcPCA is designed for the common scientific setting in which two high-dimensional datasets must be
-              compared directly. Rather than prioritizing overall variance in a single matrix, it ranks directions by
-              how strongly they are enriched in one condition relative to another. The symmetric v4 formulation is the
-              flagship presentation because it treats both datasets equally while yielding interpretable component
-              scores and eigenvalues.
+              gcPCA is built for experiments where the main question is comparative: what changes in the transcriptomics between health and disease? Instead of finding directions with the largest total variance in one dataset, gcPCA ranks directions by relative enrichment between high-dimensional datasets. The symmetric v4 formulation treats the two conditions on equal footing and returns components whose signs and eigenvalues have a direct interpretation.
             </p>
             <div class="hero-actions">
               <a
@@ -115,16 +110,16 @@
             <p class="panel-label">Why researchers reach for gcPCA</p>
             <h2>Contrast without tuning</h2>
             <ul class="feature-list">
-              <li>Hyperparameter-free contrastive dimensionality reduction for paired conditions.</li>
-              <li>Designed to identify directions enriched in dataset A relative to dataset B, or vice versa.</li>
-              <li>v4 uses a symmetric normalized objective, so neither dataset is privileged as pure background.</li>
-              <li>Eigenvalues stay in a compact, interpretable range, making components easier to read and compare.</li>
+              <li>Compares two datasets directly rather than analyzing each condition separately.</li>
+              <li>Identifies directions enriched in dataset A relative to dataset B, or the reverse.</li>
+              <li>The v4 objective is symmetric, so neither dataset has to be treated as a fixed background condition.</li>
+              <li>Eigenvalues fall in a bounded range, making component direction and strength easier to interpret.</li>
             </ul>
             <div class="pill-row" aria-label="Method highlights">
               <span class="pill">Hyperparameter-free</span>
               <span class="pill">Symmetric v4</span>
               <span class="pill">Sparse variants</span>
-              <span class="pill">Research-ready</span>
+              <span class="pill">Available in Python / R / MATLAB</span>
             </div>
           </aside>
         </div>
@@ -134,44 +129,35 @@
         <div class="container">
           <div class="section-heading" data-reveal>
             <p class="eyebrow">Why gcPCA</p>
-            <h2>When the scientific question is contrast, vanilla PCA is asking the wrong question.</h2>
+            <h2>PCA explains variance within one dataset. gcPCA targets differences between datasets.</h2>
             <p class="section-lead">
-              PCA operates on one dataset at a time and prioritizes total variance. Many experiments, however, are
-              fundamentally comparative: treated versus control, wake versus sleep, baseline versus stimulation,
-              expression A versus expression B. In that setting, the dominant modes of variation can be shared across
-              both conditions and obscure the low-dimensional structure that actually differs.
+              PCA is often useful, but it answers a single-dataset question: which directions explain the most variance? Many experiments are instead comparative: treated versus control, wake versus sleep, baseline versus stimulation, or one cell state versus another. In those cases, the largest sources of variance may be shared across conditions, while the experimentally relevant structure lies in directions that differ between them.
             </p>
           </div>
 
           <div class="info-grid">
             <article class="card" data-reveal>
-              <h3>Single-dataset variance is not the full story</h3>
+              <h3>PCA does not model the contrast directly</h3>
               <p>
-                PCA is powerful when one matrix contains the whole question. For paired conditions, it cannot directly
-                ask whether a direction is preferentially enriched in one dataset relative to another.
+                PCA can summarize variation in one matrix, but it does not ask whether a direction is more variable in one condition than another. For paired datasets, that distinction is often the main scientific question.
               </p>
             </article>
             <article class="card" data-reveal>
-              <h3>Shared background structure can dominate</h3>
+              <h3>Shared structure can mask condition-specific structure</h3>
               <p>
-                Large common sources of variance, including batch effects, population-wide fluctuations, or shared
-                covariance structure, can overwhelm the condition-specific signal researchers actually want to study.
+                Batch effects, global activity fluctuations, population-level covariance, or other shared sources of variation can dominate a PCA embedding even when they are not the features of interest.
               </p>
             </article>
             <article class="card" data-reveal>
-              <h3>cPCA introduced the right instinct</h3>
+              <h3>cPCA introduced an explicit contrast</h3>
               <p>
-                cPCA framed the problem as a contrast between conditions, but the method typically requires scanning
-                over a hyperparameter \(\alpha\), yielding multiple candidate embeddings and no intrinsic rule for
-                selecting the correct one.
+                Contrastive PCA compares a foreground dataset against a background dataset using an alpha parameter. In practice, users often scan over alpha values and inspect several embeddings before choosing one.
               </p>
             </article>
             <article class="card" data-reveal>
-              <h3>gcPCA normalizes the contrast</h3>
+              <h3>gcPCA uses a normalized contrast</h3>
               <p>
-                gcPCA reformulates the objective so it emphasizes relative changes in variance instead of favoring
-                high-variance dimensions by default. The result is a practical, hyperparameter-free workflow that is
-                easier to interpret and easier to use.
+                gcPCA replaces the manual alpha scan with a normalized objective. This shifts the emphasis from absolute variance to relative enrichment, producing a more direct workflow for comparing two conditions.
               </p>
             </article>
           </div>
@@ -182,10 +168,9 @@
         <div class="container">
           <div class="section-heading" data-reveal>
             <p class="eyebrow">Visual intuition</p>
-            <h2>Relative enrichment matters more than raw magnitude.</h2>
+            <h2>A low-variance direction can still be the most condition-specific direction.</h2>
             <p class="section-lead">
-              In synthetic settings with strong shared variance, the most informative structure can be low in absolute
-              variance yet clearly enriched in one condition. gcPCA is built to surface that relative change.
+              In datasets with strong shared variance, the direction that best separates the conditions may not be the direction with the largest absolute variance. gcPCA is designed to recover directions whose variance changes most strongly between conditions.
             </p>
           </div>
 
@@ -208,9 +193,7 @@
               <span class="figure-placeholder" hidden></span>
             </button>
             <figcaption>
-              Synthetic intuition: gcPCA emphasizes relative changes in variance and can recover low-variance
-              condition-specific structure that sits beneath large shared dimensions. This is the core reason the
-              method succeeds where overall-variance methods can miss the relevant changes.
+              Synthetic example: a condition-specific signal can be small in absolute variance but large in relative enrichment. gcPCA prioritizes that relative change, allowing it to recover structure that PCA can miss when shared variance dominates.
             </figcaption>
           </figure>
         </div>
@@ -220,7 +203,7 @@
         <div class="container">
           <div class="section-heading" data-reveal>
             <p class="eyebrow">Method overview</p>
-            <h2>Four steps from paired datasets to generalized contrastive components.</h2>
+            <h2>From two covariance matrices to contrastive components.</h2>
           </div>
 
           <div class="steps-grid">
@@ -228,7 +211,7 @@
               <span class="step-number">01</span>
               <h3>Estimate covariance in both conditions</h3>
               <p>
-                Start from two matched feature spaces, dataset A and dataset B, and compute the covariance matrices
+                Start with two datasets measured in the same feature space, A and B, and estimate their covariance matrices
                 \(C_A\) and \(C_B\).
               </p>
             </article>
@@ -236,24 +219,21 @@
               <span class="step-number">02</span>
               <h3>Construct a contrastive objective</h3>
               <p>
-                Define a direction \(x\) that should score highly when variance is enriched in one dataset relative to
-                the other.
+                Define directions \(x\) that score highly when variance differs between the two datasets.
               </p>
             </article>
             <article class="step-card card" data-reveal>
               <span class="step-number">03</span>
               <h3>Normalize the contrast</h3>
               <p>
-                Normalize by background variance or total variance, depending on the variant, so the objective reflects
-                relative enrichment rather than raw scale.
+                Normalize the contrast so components reflect relative enrichment rather than simply favoring high-variance directions.
               </p>
             </article>
             <article class="step-card card" data-reveal>
               <span class="step-number">04</span>
               <h3>Solve the eigenproblem and project</h3>
               <p>
-                Solve the resulting eigenvalue problem, rank the generalized contrastive components, and project each
-                dataset into the low-dimensional space for visualization or downstream analysis.
+                Solve the resulting eigenvalue problem, order the components, and project each dataset into the contrastive component space.
               </p>
             </article>
           </div>
@@ -264,7 +244,7 @@
         <div class="container">
           <div class="section-heading" data-reveal>
             <p class="eyebrow">Mathematical formulation</p>
-            <h2>The flagship v4 objective is symmetric, bounded, and easy to interpret.</h2>
+            <h2>The v4 objective measures normalized contrastive variance.</h2>
           </div>
 
           <div class="math-layout">
@@ -278,20 +258,18 @@
                 \]
               </div>
               <p>
-                In v4, the numerator measures the contrast between conditions while the denominator normalizes by total
-                variance. This makes the formulation symmetric and naturally suited to comparisons in which both
-                datasets should be treated on equal footing.
+                In v4, the numerator captures the difference in variance between conditions, while the denominator normalizes by their total variance. This produces a symmetric objective: swapping A and B changes the sign of the result but not the underlying comparison.
               </p>
             </article>
 
             <article class="card keyfacts-card" data-reveal>
               <p class="equation-label">Interpretation</p>
               <ul class="keyfacts-list">
-                <li><strong>v4 is symmetric.</strong> Swapping A and B flips the sign of the eigenvalues, not the logic.</li>
-                <li><strong>Eigenvalues lie in \([-1, 1]\).</strong> The scale is compact and comparable across components.</li>
-                <li><strong>Positive values</strong> indicate components enriched in A.</li>
-                <li><strong>Negative values</strong> indicate components enriched in B.</li>
-                <li><strong>Values near zero</strong> indicate structure shared across both datasets.</li>
+                <li><strong>Symmetric comparison:</strong> neither condition is treated as the fixed background.</li>
+                <li><strong>Bounded eigenvalues:</strong> values lie in \([-1, 1]\).</li>
+                <li><strong>Positive values:</strong> variance is enriched in dataset A.</li>
+                <li><strong>Negative values:</strong> variance is enriched in dataset B.</li>
+                <li><strong>Values near zero:</strong> the component is not strongly enriched in either dataset.</li>
               </ul>
             </article>
           </div>
@@ -342,10 +320,9 @@
         <div class="container">
           <div class="section-heading" data-reveal>
             <p class="eyebrow">Example results</p>
-            <h2>From controlled synthetic structure to real experimental data.</h2>
+            <h2>Examples where the contrastive structure is not the largest source of variance.</h2>
             <p class="section-lead">
-              The method is most compelling when strong shared variance would otherwise dominate the embedding.
-              gcPCA keeps the comparison centered on enrichment, not raw scale.
+              gcPCA is useful when the structure that differs between conditions is weaker than the variation shared by both conditions. In these cases, a variance-maximizing method can emphasize the wrong directions.
             </p>
           </div>
 
@@ -354,10 +331,7 @@
               <div class="result-copy">
                 <h3>Synthetic data</h3>
                 <p>
-                  PCA follows the highest total variance, which can be largely shared across conditions. cPCA can
-                  recover the contrastive manifold, but often only after a manual sweep over \(\alpha\). gcPCA returns
-                  components ordered by normalized enrichment, making low-variance condition-specific structure much
-                  easier to recover and compare.
+                  In synthetic data, PCA follows the directions with the largest total variance, even when those directions are shared across conditions. cPCA can recover contrastive structure, but usually requires scanning over \(\alpha\). gcPCA orders components by normalized enrichment, making the condition-specific directions easier to identify without a manual parameter search.
                 </p>
               </div>
               <button
@@ -381,12 +355,9 @@
 
               <article class="card result-card" data-reveal>
                 <div class="result-copy">
-                  <h3>Real data: replay structure</h3>
+                  <h3>Hippocampal replay example</h3>
                   <p>
-                    In the replay example, a side-by-side comparison with PCA makes the advantage of gcPCA more
-                    apparent. PCA remains dominated by the largest shared modes of activity, whereas gcPCA emphasizes
-                    the dimensions selectively enriched during replay. The result is a clearer low-dimensional view of
-                    replay-related structure without requiring supervised labels or a hyperparameter search.
+                    During ripples, PCA is dominated by large shared modes of activity. gcPCA instead emphasizes dimensions whose variance is enriched during replay, producing a lower-dimensional view that is more directly tied to the replay-related structure. The method does this without labels and without an alpha sweep.
                   </p>
                 </div>
                 <button
@@ -469,11 +440,9 @@
         <div class="container install-layout">
           <div class="section-heading" data-reveal>
             <p class="eyebrow">Python package / quick start</p>
-            <h2>Move from paper to working code in a few lines.</h2>
+            <h2>Install gcPCA and run the v4 method.</h2>
             <p class="section-lead">
-              The Python example below is the fastest way to get started. gcPCA is also available in R on CRAN and as
-              a MATLAB implementation in the main repository, with additional language-specific notes collected in the
-              GitHub wiki.
+              The Python package provides the workflow shown below. R and MATLAB implementations are also available from the project repository, with additional setup notes in the GitHub wiki.
             </p>
             <div class="install-panel card">
               <div class="install-panel-head">
@@ -517,9 +486,7 @@ scores_B = model.Rb_scores_
 loadings = model.loadings_
 eigenvalues = model.gcPCA_values_</code></pre>
             <p class="code-note">
-              The current repository README documents <code>gcPCA(method="v4", normalize_flag=True)</code> followed by
-              <code>fit(X_A, X_B)</code>, with outputs such as <code>loadings_</code>, <code>Ra_scores_</code>,
-              <code>Rb_scores_</code>, and <code>gcPCA_values_</code>.
+              The repository documents the v4 workflow using <code>gcPCA(method="v4", normalize_flag=True)</code>, followed by <code>fit(X_A, X_B)</code>. Common outputs include <code>loadings_</code>, <code>Ra_scores_</code>, <code>Rb_scores_</code>, and <code>gcPCA_values_</code>.
             </p>
             <p class="code-note">
               R and MATLAB implementations are available as well. The
@@ -534,7 +501,7 @@ eigenvalues = model.gcPCA_values_</code></pre>
         <div class="container">
           <div class="section-heading" data-reveal>
             <p class="eyebrow">Resources</p>
-            <h2>Start with the paper, then move into code, notebooks, and implementation details.</h2>
+            <h2>Paper, code, tutorials, and implementation notes.</h2>
           </div>
 
           <div class="resource-grid">
@@ -550,7 +517,7 @@ eigenvalues = model.gcPCA_values_</code></pre>
             </article>
             <article class="card resource-card" data-reveal>
               <h3>Python tutorial notebook for regular gcPCA</h3>
-              <p>Notebook-based walkthrough with synthetic data and the expected method inputs and common outputs. Gives intuition on amount of variance explained by gcPCA. </p>
+              <p>A notebook walkthrough using synthetic data, including expected inputs, common outputs, and interpretation of gcPCA variance structure. </p>
               <a
                 href="https://github.com/SjulsonLab/generalized_contrastive_PCA/blob/main/tutorial/gcpca_tutorial1.ipynb"
                 target="_blank"
@@ -562,7 +529,7 @@ eigenvalues = model.gcPCA_values_</code></pre>
             <article class="card resource-card resource-card-pending" data-reveal>
               <h3>Python tutorial notebook for sparse gcPCA</h3>
               <p>
-                A second notebook presenting the math and intuition behind sparse gcPCA. Feature the use on real dataset and how to achieve feature selection.
+                A second notebook covering sparse gcPCA, including the motivation for feature selection and an example using single-cell RNA sequencing data.
               </p>
               <a
                 href="https://github.com/SjulsonLab/generalized_contrastive_PCA/blob/main/tutorial/gcpca_tutorial2.ipynb"
@@ -585,7 +552,7 @@ eigenvalues = model.gcPCA_values_</code></pre>
         <div class="container citation-layout">
           <div class="section-heading" data-reveal>
             <p class="eyebrow">Citation</p>
-            <h2>Cite gcPCA if the method contributes to your work.</h2>
+            <h2>Citing gcPCA</h2>
           </div>
 
           <article class="card citation-card" data-reveal>
@@ -620,7 +587,7 @@ eigenvalues = model.gcPCA_values_</code></pre>
 
     <footer class="site-footer">
       <div class="container footer-shell">
-        <p>gcPCA is a hyperparameter-free contrastive dimensionality reduction method for comparing paired conditions.</p>
+        <p>gcPCA compares paired high-dimensional datasets by identifying directions enriched in one condition relative to another.</p>
         <a href="#top">Back to top</a>
       </div>
     </footer>
